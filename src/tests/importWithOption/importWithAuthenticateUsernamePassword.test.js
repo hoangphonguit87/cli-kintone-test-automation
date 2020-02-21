@@ -16,7 +16,7 @@ describe('Import with --import option: Authenticate with username/password (-u) 
     expect(result).toEqual(expect.stringContaining('DONE'));
   });
 
-  test('C012 - Verify that error will be displayed when importing data with wrong username', async () => {
+  test.skip('C012 - Verify that error will be displayed when importing data with wrong username', async () => {
     const command = getCliKintoneCommand()
       + ' -a ' + kintoneInfo.appId
       + ' -d ' + kintoneInfo.domain
@@ -32,7 +32,7 @@ describe('Import with --import option: Authenticate with username/password (-u) 
     expect(result.toString()).toEqual(expect.stringContaining('ヘッダーの値が正しくありません'));
   });
 
-  test('C013 - Verify that error will be displayed when importing data with wrong password', async () => {
+  test.skip('C013 - Verify that error will be displayed when importing data with wrong password', async () => {
     const command = getCliKintoneCommand()
       + ' -a ' + kintoneInfo.appId
       + ' -d ' + kintoneInfo.domain
@@ -61,7 +61,7 @@ describe('Import with --import option: Authenticate with username/password (-u) 
     expect(result).toEqual(expect.stringContaining('DONE'));
   });
 
-  test('C016 - When not providing password: Input wrong password and verify that error will be displayed', async () => {
+  test.skip('C016 - When not providing password: Input wrong password and verify that error will be displayed', async () => {
     const command = 'echo ' + kintoneInvalidInfo.wrong_password + '|' + getCliKintoneCommand()
       + ' -a ' + kintoneInfo.appId
       + ' -d ' + kintoneInfo.domain
@@ -76,7 +76,7 @@ describe('Import with --import option: Authenticate with username/password (-u) 
     expect(result.toString()).toEqual(expect.stringContaining('ヘッダーの値が正しくありません'));
   });
 
-  test('C017 - Verify that error will be displayed with user who doesn’t have View record permission for an app', async () => {
+  test.skip('C017 - Verify that error will be displayed with user who doesn’t have View record permission for an app', async () => {
     const command = getCliKintoneCommand()
       + ' -a ' + kintoneInfo.appId
       + ' -d ' + kintoneInfo.domain
@@ -92,7 +92,7 @@ describe('Import with --import option: Authenticate with username/password (-u) 
     expect(result.toString()).toEqual(expect.stringContaining('権限がありません。'));
   });
 
-  test('C018 - Verify that error will be displayed when executing command with wrong App ID', async () => {
+  test.skip('C018 - Verify that error will be displayed when executing command with wrong App ID', async () => {
     const command = getCliKintoneCommand()
       + ' -a ' + kintoneInvalidInfo.appId
       + ' -d ' + kintoneInfo.domain
