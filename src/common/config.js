@@ -7,7 +7,7 @@ const kintoneInfo = {
     appId: 1,
     domain: 'clitool.kintone.com',
     username: 'phonghoang.cybozu@gmail.com',
-    password: 'clitool123',
+    password: 'clidemo123',
     token: 'hNSZkLg3EfZrJcNhzKxUaOB9uE2x6lxdmIawYlRk'
 }
 
