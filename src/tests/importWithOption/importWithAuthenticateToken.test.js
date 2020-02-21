@@ -1,7 +1,7 @@
 const { executeCommand, getCliKintoneCommand } = require('../../common/helper');
 const { kintoneInfo, kintoneInvalidInfo, filesInfo} = require('../../common/config');
 
-describe('Import with --import option: ■Authenticate with token (-t)', () => {
+describe.skip('Import with --import option: ■Authenticate with token (-t)', () => {
   test('C031: Verify that data can be imported with API Token', async () => {
     const command = getCliKintoneCommand()
       + ' -a ' + kintoneInfo.appId

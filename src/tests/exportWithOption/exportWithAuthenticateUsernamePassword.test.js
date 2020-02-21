@@ -12,7 +12,7 @@ beforeAll(async () => {
     await executeCommand(command);
 })
 
-describe('Export with --export option: ■Export data with output format (-o)', () => {
+describe.skip('Export with --export option: ■Export data with output format (-o)', () => {
     test('Case 149: Verify that data can be exported in csv format', async () => {
         const query = makeQueryToGetAppData();
         const fieldNames = 'txt_firstName,txt_lastName,txt_description';
