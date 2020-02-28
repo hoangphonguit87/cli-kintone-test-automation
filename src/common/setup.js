@@ -26,7 +26,7 @@ const getCompatibleBuild = platform => {
                 fileName: 'cli-kintone.exe',
                 filePath: 'build/windows-x64/',
                 archiveName: 'windows-x64.zip',
-                releareleasedUrlsedPath: `${baseRealeasedUrl}/windows-x64.zip`
+                platforms: `${baseRealeasedUrl}/windows-x64.zip`
             };
             break;
         default: // linux cases
