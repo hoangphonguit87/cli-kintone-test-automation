@@ -3,82 +3,72 @@ const mv = require('mv');
 const request = require('request');
 const unzip = require('unzip-stream');
 
-const os_system = process.platform;
-const linux_url = 'https://github.com/kintone/cli-kintone/releases/download/v0.10.1/linux-x64.zip';
-const windows_url = 'https://github.com/kintone/cli-kintone/releases/download/v0.10.1/windows-x64.zip';
-const mac_url = 'https://github.com/kintone/cli-kintone/releases/download/v0.10.1/macos-x64.zip';
-
-function getFileName() {
-    if (os_system == 'darwin') {
-        return 'cli-kintone';
-    } else if (os_system == 'win32') {
-        return 'cli-kintone.exe';
-    } else {
-        return 'cli-kintone';
-    }
+const releasedVersion = 'v0.10.1';
+const baseRealeasedUrl = `https://github.com/kintone/cli-kintone/releases/download/${releasedVersion}`;
+const platforms = {
+    // Ref: https://nodejs.org/api/process.html#process_process_platform
+    macOS: 'darwin', windows: 'win32', linux: ['linux', 'freebsd', 'openbsd', 'sunos', 'aix']
 }
 
-function getBuildPath() {
-    if (os_system == 'darwin') {
-        return 'build/macos-x64/';
-    } else if (os_system == 'win32') {
-        return 'build/windows-x64/';
-    } else {
-        return 'build/linux-x64/';
+const getCompatibleBuild = platform => {
+    let buildInfo = {}
+    switch (platform) {
+        case platforms.macOS:
+            buildInfo = {
+                fileName: 'cli-kintone',
+                filePath: 'build/macos-x64/',
+                archiveName: 'macos-x64.zip',
+                releasedUrl: `${baseRealeasedUrl}/macos-x64.zip`
+            };
+            break;
+        case platforms.windows:
+            buildInfo = {
+                fileName: 'cli-kintone.exe',
+                filePath: 'build/windows-x64/',
+                archiveName: 'windows-x64.zip',
+                releareleasedUrlsedPath: `${baseRealeasedUrl}/windows-x64.zip`
+            };
+            break;
+        default: // linux cases
+            buildInfo = {
+                fileName: 'cli-kintone',
+                filePath: 'build/linux-x64/',
+                archiveName: 'linux-x64.zip',
+                releasedUrl: `${baseRealeasedUrl}/linux-x64.zip`
+            }
     }
+    return buildInfo;
 }
 
-function getArchiveName() {
-    if (os_system == 'darwin') {
-        return 'macos-x64.zip';
-    } else if (os_system == 'win32') {
-        return 'windows-x64.zip';
-    } else {
-        return 'linux-x64.zip';
-    }
-}
-
-function getRealUrl() {
-    if (os_system == 'darwin') {
-        return mac_url;
-    } else if (os_system == 'win32') {
-        return windows_url;
-    } else {
-        return linux_url;
-    }
-}
-
-async function dowloadCliKintoneBuild() {
+async function dowloadCliKintoneBuild(releasedUrl, archiveName) {
     return new Promise((resolve, reject) => {
-        request(getRealUrl())
-            .pipe(fs.createWriteStream(getArchiveName()))
-            .on('close', function () {
+        request(releasedUrl)
+            .pipe(fs.createWriteStream(archiveName))
+            .on('close', () => {
                 resolve();
             });
     });
 }
 
-async function unzipCliKintoneBuild() {
-    const zip_path = './' + getArchiveName();
-
-    return new Promise ((resolve, reject) => { 
-        fs.createReadStream(zip_path)
-        .pipe(unzip.Extract({ path: './' }))
-        .on('close', function () {
-            resolve();
-        });
+async function unzipCliKintoneBuild(archiveName) {
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(`./${archiveName}`)
+            .pipe(unzip.Extract({ path: './' }))
+            .on('close', () => {
+                resolve();
+            });
     });
 }
 
-async function moveCliKintoneToRootFolder() {
-    const old_path = './' + getBuildPath() + getFileName();
-    const new_path = './' + getFileName();
+async function moveCliKintoneToRootFolder(filePath, fileName) {
+    const currentPath = `./${filePath}${fileName}`;
+    const newPath = `./${fileName}`;
 
-    mv(old_path, new_path, function (err) {
+    mv(currentPath, newPath, err => {
         if (err) {
-            console.log(err);
+            console.error(err);
         } else {
-            fs.chmodSync(new_path, '777');
+            fs.chmodSync(newPath, '777');
         }
     });
 }
@@ -91,26 +81,27 @@ async function removeBuildFolder() {
     }
 }
 
-async function removeBuildArchive() {
-    fs.unlinkSync(getArchiveName());
+async function removeBuildArchive(archiveName) {
+    fs.unlinkSync(archiveName);
 }
 
 module.exports = async () => {
-    const path = './' + getFileName();
+    const buildInfo = getCompatibleBuild(process.platform);
+    const path = './' + buildInfo.fileName;
 
     if (!fs.existsSync(path)) {
         console.log('\n--------- START PREPARATION CLI-KINTONE BUILD ----------');
 
         console.log('start dowloading ... ');
-        await dowloadCliKintoneBuild();
+        await dowloadCliKintoneBuild(buildInfo.releasedUrl, buildInfo.archiveName);
         console.log('dowload finished');
 
         console.log('start unzip ... ');
-        await unzipCliKintoneBuild();
+        await unzipCliKintoneBuild(buildInfo.archiveName);
         console.log('unzip finished ... ');
 
         console.log('move cli to root ... ');
-        await moveCliKintoneToRootFolder();
+        await moveCliKintoneToRootFolder(buildInfo.filePath, buildInfo.fileName);
         console.log('move finished ... ');
 
         console.log('remove build folder ... ');
@@ -118,7 +109,7 @@ module.exports = async () => {
         console.log('remove finshed ... ');
 
         console.log('remove archive folder ... ');
-        await removeBuildArchive();
+        await removeBuildArchive(buildInfo.archiveName);
         console.log('remove finshed ... ');
 
         console.log('--------- FINISHED PREPARATION CLI-KINTONE BUILD ----------');
